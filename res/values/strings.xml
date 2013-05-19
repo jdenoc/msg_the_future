@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Message the Future!</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="time_button">Set Time</string>
+    <string name="date_button">Set Date</string>
+    <string name="send_button">Message the Future</string>
+    <string name="time_default">HH : MM</string>
+    <string name="date_default">YYYY-MM-DD</string>
+    <string name="invalid_date_time">You have not selected a date/time in the future</string>
+    <string name="contact_button">Contacts</string>
+    <string name="hint_msg">Message</string>
+    <string name="hint_number">Phone Number</string>
+
+</resources>

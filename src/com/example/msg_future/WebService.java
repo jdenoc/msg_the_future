@@ -23,7 +23,6 @@ public class WebService extends Service{
 
 	@Override
     public void onCreate() {
- 
         Toast.makeText(this, "Congrats! MyService Created", Toast.LENGTH_LONG).show();
         Log.d(TAG, "onCreate");
     }
@@ -68,7 +67,7 @@ public class WebService extends Service{
 	            	new HTTPconnect().execute(		// AsyncTask<Object, Void, Boolean>
     					getApplicationContext(),	// Activity Context
     					2,							// Type
-    					"http://ec2-54-241-47-117.us-west-1.compute.amazonaws.com/get_messages.php",
+    					"get_messages.php",			// URL 				(file/script)
     					getMyPhoneNumber()			// from 			(devices phone number)
     				);
                     Thread.sleep(RUN_INTERVAL);

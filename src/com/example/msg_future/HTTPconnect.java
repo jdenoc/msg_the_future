@@ -7,6 +7,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,8 @@ import android.widget.Toast;
 public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 
 	private final String TAG = "HTTPconnect";		// TESTING
+	private final String DOMAIN = "http://msgtf.jdenoc.com/scripts/";
+	
 	private Context mainThread;
 	private int type;
 	
@@ -29,7 +33,6 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 //	   	Runs processes in background
 		mainThread = (Context) params[0];
 		type = (Integer) params[1];
-		
 		
 		if(type == 1){		// 1: send data to server
 			return sendData(params);
@@ -47,7 +50,7 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 			} else {
 				Log.d(TAG, "Failure!");		//	TESTING
 				Toast.makeText(mainThread, "Message NOT scheduled (;_;)", Toast.LENGTH_SHORT).show();
-			}
+			}	
 		} else {			// 2: get data result
 			if(result){
 				Log.d(TAG, "Success!");		//	TESTING
@@ -63,7 +66,7 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 	private boolean sendData(Object[] data){
 		// Context data[0]
 		// int data[1]		Type		(1: send data value)
-		// String data[2]	URL
+		// String data[2]	URL			(PHP file/script)
 		// String data[3]	msg
 		// String data[4]	phone
 		// String data[5]	from		(device phone number)
@@ -72,28 +75,32 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 		// String data[8]	timezone 	(device's current timezone)
 		
 		try{
+			Log.d(TAG+"_sendData", "URL: "+DOMAIN+(String) data[2]+"?phone="+(String) data[3]);
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpPost httppost = new HttpPost((String) data[2]);
-			Log.d(TAG, "Site Accessed");		//	TESTING
+			HttpPost httppost = new HttpPost(DOMAIN+(String) data[2]);
+			Log.d(TAG+"_sendData", "Site Accessed");		//	TESTING
 			
 			JSONObject obj = new JSONObject();
 			obj.put("msg", (String) data[3]);
 			obj.put("phone", (String) data[4]);
 			obj.put("from", (String) data[5]);
 			obj.put("send", processSendDate((String) data[6], (String) data[7], (String) data[8]));
-		    httppost.setEntity(new StringEntity(obj.toString(), "UTF-8"));
-		    
+			
+			StringEntity se = new StringEntity(obj.toString());
+			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+			
+			httppost.setEntity(se);
 			HttpResponse response = httpclient.execute(httppost);
 			HttpEntity entity = response.getEntity();
 			String responceValue = EntityUtils.toString(entity);
-			Log.d(TAG, "Response: "+responceValue);
+			Log.d(TAG+"_sendData", "Response: "+responceValue);
 			if (responceValue.equals("1")){
 				return true;
 			}else{
 				return false;
 			}
 		}catch(Exception e){
-			Log.e(TAG, "Error in http connection: "+e.toString());		//	TESTING
+			Log.e(TAG+"_sendData", "Error in http connection: "+e.toString());		//	TESTING
 			return false;
 		}
 	}
@@ -107,16 +114,16 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 		String json = "";
 		
 		try{
-			Log.d(TAG, "URL: "+(String) data[2]+"?phone="+(String) data[3]);
+			Log.d(TAG+"_getData", "URL: "+DOMAIN+(String) data[2]+"?phone="+(String) data[3]);
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httppost = new HttpGet((String) data[2]+"?phone="+(String) data[3]);
-			Log.d(TAG, "Site Accessed");		//	TESTING
+			HttpGet httppost = new HttpGet(DOMAIN+(String) data[2]+"?phone="+(String) data[3]);
+			Log.d(TAG+"_getData", "Site Accessed");		//	TESTING
 			
 			HttpResponse response = httpclient.execute(httppost);
 			HttpEntity entity = response.getEntity();
 			json = EntityUtils.toString(entity);
 		    
-			Log.d(TAG, "Response: "+json);
+			Log.d(TAG+"_getData", "Response: "+json);
 			return json;
 			
 		}catch(Exception e){
@@ -135,7 +142,7 @@ public class HTTPconnect extends AsyncTask<Object, Void, Boolean>{
 			msg = msgData.getString("msg");
 		} catch (JSONException e) {
 			e.printStackTrace();
-			Log.e(TAG, "JSON ERROR: "+e.toString());
+			Log.e(TAG+"_sendSms", "JSON ERROR: "+e.toString());
 			return false;
 		}
 		

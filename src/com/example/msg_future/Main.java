@@ -90,7 +90,7 @@ public class Main extends Activity implements OnClickListener {
 				new HTTPconnect().execute(		// AsyncTask<Object, Void, Boolean>
 					getApplicationContext(),	// Activity Context
 					1,							// Type
-					"http://ec2-54-241-47-117.us-west-1.compute.amazonaws.com/schedule_msg.php",
+					"schedule_msg.php",			// URL				(PHP file/script)
 					msgText,					// msg		
 					contactsText,				// phone			(message to text to)
 					getMyPhoneNumber(),			// from 			(devices phone number)
@@ -133,12 +133,6 @@ public class Main extends Activity implements OnClickListener {
             SettingsDialogFragment settings = new SettingsDialogFragment(this);
             settings.setRetainInstance(true);
             settings.show(fm, "settings");
-//            if(settings.getResponce()){
-//            	Toast.makeText(this, "START service", Toast.LENGTH_LONG).show();
-//            }else{
-//            	Toast.makeText(this, "STOP service", Toast.LENGTH_LONG).show();
-//            }
-            	
 			break;
 		}
 		return false;
@@ -167,6 +161,7 @@ public class Main extends Activity implements OnClickListener {
 	       case (PICK_CONTACT):
 	         if (resultCode == Activity.RESULT_OK){
 	             String id, name;
+	             long photo_thumb;
 	        	 Uri contactData = data.getData();
 
 //	             *** DEPRICATED (but works) ***
@@ -176,6 +171,7 @@ public class Main extends Activity implements OnClickListener {
 //	                  other data is available for the Contact.  I have decided to only get the name of the Contact.
 	            	 id = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
 	                 name = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+	                 photo_thumb = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
 	                 if(c.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER) > 0){
 	                // Query phone here. Covered next
 	                     Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,null, null);
@@ -189,10 +185,12 @@ public class Main extends Activity implements OnClickListener {
 	                    	 numbers.put(label, number);
                          } 
 	                     phones.close(); 
+	                 } else {
+	                	 numbers.put("not", "available");
 	                 }
 	                 
 	                 FragmentManager fm = getFragmentManager();
-	                 ChooseNumberDialogFragment cndf = new ChooseNumberDialogFragment(contacts, numbers, name);
+	                 ChooseNumberDialogFragment cndf = new ChooseNumberDialogFragment(contacts, numbers, name, photo_thumb);
 	                 cndf.setRetainInstance(true);
 	                 cndf.show(fm, "chooseNumber");
 	             }
